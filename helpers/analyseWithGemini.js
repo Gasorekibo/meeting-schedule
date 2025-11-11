@@ -49,7 +49,6 @@ Format your response in a conversational way, as if you're speaking directly to 
       body: JSON.stringify(formattedPrompt),
     });
     const data = await response.json();
-    console.log('Gemini AI response data:', data.candidates[0]);
     return data?.candidates[0].output;
   } catch (error) {
     console.error('Gemini AI error:', error);
