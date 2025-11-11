@@ -1,0 +1,27 @@
+{
+  "name": "meeting-schedule",
+  "version": "1.0.0",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "google-auth-library": "^10.5.0",
+    "googleapis": "^165.0.0",
+    "luxon": "^3.7.2",
+    "mongoose": "^8.19.3",
+    "nodemon": "^3.1.10"
+  }
+}
