@@ -1,27 +1,21 @@
 import dotenv from 'dotenv';
 import express from 'express';
-
 import { OAuth2Client } from 'google-auth-library';
-
 import Employee from './models/Employees.js';
 import cors from 'cors';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import connectDB from './helpers/config.js';
 import requestMeetingHandler from './controllers/requestMeeting.js';
+import bookMeetingHandler from './controllers/bookMeeting.js';
 
 dotenv.config();
 const app = express();
 app.use(express.json());
+
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST'],
 }));
 const PORT = process.env.PORT || 3000;
-
-// Initialize Gemini AI
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-
 
 export const oauth2Client = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
@@ -34,6 +28,7 @@ app.get('/auth', (req, res) => {
     access_type: 'offline',
     scope: [
       'https://www.googleapis.com/auth/calendar.readonly',
+      'https://www.googleapis.com/auth/calendar.events',
       'https://www.googleapis.com/auth/userinfo.email',
       'https://www.googleapis.com/auth/userinfo.profile'
     ],
@@ -83,6 +78,7 @@ app.get('/oauth/callback', async (req, res) => {
   }
 });
 app.post('/request-meeting',requestMeetingHandler);
+app.post('/book-meeting', bookMeetingHandler);
 app.post('/calendar-data', async (req, res) => {
   const { employeeName } = req.body;
   if (!employeeName) return res.status(400).json({ error: 'no employee name' });
