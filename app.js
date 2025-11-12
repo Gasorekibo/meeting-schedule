@@ -32,43 +32,56 @@ export const oauth2Client = new OAuth2Client(
 app.get('/auth', (req, res) => {
   const url = oauth2Client.generateAuthUrl({
     access_type: 'offline',
-    scope: ['https://www.googleapis.com/auth/calendar.readonly'],
+    scope: [
+      'https://www.googleapis.com/auth/calendar.readonly',
+      'https://www.googleapis.com/auth/userinfo.email',
+      'https://www.googleapis.com/auth/userinfo.profile'
+    ],
     prompt: 'consent',
   });
   res.redirect(url);
 });
 
+
 app.get('/oauth/callback', async (req, res) => {
   const { code } = req.query;
   try {
-    const { tokens } = await oauth2Client.getToken(code);
-    console.log('=== REFRESH TOKEN (copy this) ===');
-    console.log(tokens.refresh_token);
+    const data = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(data.tokens);
+    const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: {
+        Authorization: `Bearer ${data.tokens.access_token}`
+      }
+    });
+    
+    const userInfo = await userInfoResponse.json();
+    const existingEmployee = await Employee.findOne({ email: userInfo.email });
+    
+    if (existingEmployee) {
+      existingEmployee.refreshToken = data.tokens.refresh_token;
+      await existingEmployee.save();
+      console.log('Updated existing employee:', userInfo.email);
+    } else {
+      const newEmployee = new Employee({
+        name: userInfo.name,
+        email: userInfo.email,
+        refreshToken: data.tokens.refresh_token
+      });
+      await newEmployee.save();
+      console.log('Saved new employee:', userInfo.email);
+    }
+    
     res.send(`
       <h3>Authorization successful!</h3>
-      <p>Copy the <strong>refresh token</strong> from the server console and add the employee with the POST /save-employee endpoint.</p>
+      <p><strong>Name:</strong> ${userInfo.name}</p>
+      <p><strong>Email:</strong> ${userInfo.email}</p>
+      <p>✅ Employee automatically saved to database!</p>
     `);
   } catch (err) {
     console.error(err);
-    res.status(500).send('OAuth error');
+    res.status(500).send('OAuth error: ' + err.message);
   }
 });
-
-app.post('/save-employee', async (req, res) => {
-  const { name, email, refreshToken } = req.body;
-  if (!name || !email || !refreshToken) {
-    return res.status(400).json({ error: 'missing fields' });
-  }
-  try {
-    const emp = new Employee({ name, email, refreshToken });
-    await emp.save();
-    res.json({ message: 'Employee saved' });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});
-
-
 app.post('/request-meeting',requestMeetingHandler);
 app.post('/calendar-data', async (req, res) => {
   const { employeeName } = req.body;

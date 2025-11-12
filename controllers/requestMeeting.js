@@ -10,9 +10,9 @@ export default async function requestMeetingHandler(req, res) {
 
   const name = await extractNameFromUserMessage(message).then(n => n.trim());
   if (!name || name === "Name not found") return res.status(400).json({ error: 'Please provide a valid employee name in your message.' });
-  const employee = await Employee.findOne({ name });
-  if (!employee) return res.status(404).json({ error: 'employee not found' });
-
+  const employees = await Employee.find();
+  const employee = employees.find(emp => emp.name.toLocaleLowerCase().includes(name.toLocaleLowerCase()));
+  if (!employee) return res.status(404).json(formatNotFoundResponse(employees, name));
   const token = employee.getDecryptedToken();
   if (!token) return res.status(401).json({ error: 'no token' });
 
@@ -26,4 +26,13 @@ export default async function requestMeetingHandler(req, res) {
     console.error(e);
     res.status(500).json({ error: 'calendar or AI error', details: e.message });
   }
+}
+
+
+function formatNotFoundResponse(employees, name) {
+  const message = `Employee with name "${name}" not found. or please select from the list bellow: Available employees: ${employees.map(emp => `- ${emp.name}`).join(', ')}`;
+return {
+    error: message
+
+}
 }
