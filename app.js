@@ -77,6 +77,9 @@ app.get('/oauth/callback', async (req, res) => {
     res.status(500).send('OAuth error: ' + err.message);
   }
 });
+app.get('/', (req, res)=> {
+  res.send('Welcome to the Meeting Scheduler API. Please authenticate at /auth');
+})
 app.post('/request-meeting',requestMeetingHandler);
 app.post('/book-meeting', bookMeetingHandler);
 app.post('/calendar-data', async (req, res) => {
