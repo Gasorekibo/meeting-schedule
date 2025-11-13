@@ -19,7 +19,7 @@ export default async function requestMeetingHandler(req, res) {
   try {
     const calendarData = await getCalendarData(employee.email, token);
     const aiSuggestion = await analyzeWithGemini(calendarData, message, employee.name);
-    const response = buildFriendlyResponse(employee.name, calendarData, aiSuggestion);
+    const response = buildFriendlyResponse(employee, calendarData, aiSuggestion);
 
     res.json(response);
   } catch (e) {

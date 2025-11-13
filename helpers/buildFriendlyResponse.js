@@ -1,14 +1,14 @@
-export default function buildFriendlyResponse(employeeName, calendarData) {
+export default function buildFriendlyResponse(employee, calendarData) {
   const { freeSlots, busySlots, events, period, workingHours } = calendarData;
 
   // 1. Header
-  const header = `Hi! You asked to meet ${employeeName}.` +
+  const header = `Hi! You asked to meet ${employee.name}.` +
     `I’m checking the next ${period.days} days ` +
     `( From today: ${period.currentTime} in ${workingHours.timezone}).`;
 
   return {
 
-    employee: employeeName,
+    employee: employee,
     message: header,
      busySlots: busySlots.map(b => ({
       start: b.start,
