@@ -1,7 +1,5 @@
 {
   "name": "meeting-scheduler",
   "compatibility_date": "2025-11-13",
-  "assets": {
-    "directory": "./dist"
-  }
+    "main": "app.js"
 }
