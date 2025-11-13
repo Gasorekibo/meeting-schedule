@@ -6,6 +6,7 @@ import cors from 'cors';
 import connectDB from './helpers/config.js';
 import requestMeetingHandler from './controllers/requestMeeting.js';
 import bookMeetingHandler from './controllers/bookMeeting.js';
+import getEmployeesHandler from './controllers/getEmployeesHandler.js';
 
 dotenv.config();
 const app = express();
@@ -82,6 +83,7 @@ app.get('/', (req, res)=> {
 })
 app.post('/request-meeting',requestMeetingHandler);
 app.post('/book-meeting', bookMeetingHandler);
+app.get('/employees', getEmployeesHandler)
 app.post('/calendar-data', async (req, res) => {
   const { employeeName } = req.body;
   if (!employeeName) return res.status(400).json({ error: 'no employee name' });
